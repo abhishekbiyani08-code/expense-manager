@@ -1,0 +1,16 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <mat-tab-group animationDuration="400ms" class="mat-elevation-z4">
+    <mat-tab label="Expenses">
+      <app-expense-tab></app-expense-tab>
+    </mat-tab>
+    <mat-tab label="Income">
+      <app-income-tab></app-income-tab>
+    </mat-tab>
+    <mat-tab label="All Transactions">
+      <app-summary-cards></app-summary-cards>
+      <app-transaction-list [transactions]="allTransactions()"></app-transaction-list>
+    </mat-tab>
+  </mat-tab-group>
+</div>

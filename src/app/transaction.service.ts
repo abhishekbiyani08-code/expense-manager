@@ -30,6 +30,10 @@ export class TransactionService {
         }
       }
 
+      else {
+        this.transactions.set([]);
+      }
+
       effect(() => {
         localStorage.setItem(
           'expenseManagerTransactions',

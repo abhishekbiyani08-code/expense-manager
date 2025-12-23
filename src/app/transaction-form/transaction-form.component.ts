@@ -2,12 +2,14 @@ import { Component, Input, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { TransactionService } from '../transaction.service';
 import { Transaction } from '../transaction.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-transaction-form',
   standalone: true,
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CommonModule
   ],
   template: `
     <div class="form-container">
@@ -15,19 +17,16 @@ import { Transaction } from '../transaction.model';
         <div class="form-field">
           <label for="description">Description</label>
           <input id="description" class="form-input" type="text" formControlName="description" placeholder="e.g., Grocery, Salary">
-          <div class="error" *ngIf="form.controls.description.touched && form.controls.description.invalid">Required</div>
         </div>
 
         <div class="form-field">
           <label for="amount">Amount</label>
           <input id="amount" class="form-input" type="number" formControlName="amount" min="0.01" step="0.01" placeholder="0.00">
-          <div class="error" *ngIf="form.controls.amount.touched && form.controls.amount.invalid">Enter a valid amount</div>
         </div>
 
         <div class="form-field">
           <label for="date">Date</label>
           <input id="date" class="form-input date-input" type="date" formControlName="date">
-          <div class="error" *ngIf="form.controls.date.touched && form.controls.date.invalid">Required</div>
         </div>
 
         <div class="form-actions">
@@ -69,8 +68,6 @@ import { Transaction } from '../transaction.model';
     .date-input::-webkit-calendar-picker-indicator { filter: invert(0.15) sepia(0.02); }
     .date-input { background: #fff; }
 
-    .error { color: #d32f2f; font-size: 0.8rem; margin-top: 4px; }
-
     .form-actions { display: flex; align-items: center; }
 
     .modern-btn {
@@ -92,7 +89,7 @@ import { Transaction } from '../transaction.model';
   `]
 })
 export class TransactionFormComponent {
-  @Input({ required: true }) type!: 'expense' | 'income';
+  @Input() type!: 'expense' | 'income';
 
   private fb = inject(FormBuilder);
   private service = inject(TransactionService);
@@ -104,18 +101,34 @@ export class TransactionFormComponent {
   });
 
   onSubmit() {
-    if (this.form.valid) {
-      const values = this.form.value;
-      const transaction: Transaction = {
-        id: Date.now(),
-        description: values.description!,
-        amount: values.amount!,
-        // date input returns YYYY-MM-DD string; convert to Date
-        date: new Date(values.date!),
-        type: this.type
-      };
-      this.service.addTransaction(transaction);
-      this.form.patchValue({ description: '', amount: null, date: new Date().toISOString().substring(0,10) });
+    if (this.form.invalid) {
+      const msgs = this.getValidationMessages();
+      window.alert('Please fix the following:\n' + msgs.join('\n'));
+      return;
     }
+
+    const values = this.form.value;
+    const transaction: Transaction = {
+      id: Date.now(),
+      description: values.description!,
+      amount: values.amount!,
+      date: new Date(values.date!),
+      type: this.type
+    };
+    this.service.addTransaction(transaction);
+    this.form.patchValue({ description: '', amount: null, date: new Date().toISOString().substring(0,10) });
+  }
+
+  private getValidationMessages(): string[] {
+    const messages: string[] = [];
+    const c = this.form.controls;
+    if (c.description.invalid) messages.push('Description is required.');
+    if (c.amount.invalid) {
+      if (c.amount.errors?.['required']) messages.push('Amount is required.');
+      else if (c.amount.errors?.['min']) messages.push('Amount must be at least 0.01.');
+      else messages.push('Amount is invalid.');
+    }
+    if (c.date.invalid) messages.push('Date is required.');
+    return messages;
   }
 }

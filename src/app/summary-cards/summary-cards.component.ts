@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { TransactionService } from '../transaction.service';
 import { CurrencyPipe, NgClass } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-summary-cards',
@@ -16,21 +17,21 @@ import { MatCardModule } from '@angular/material/card';
       <mat-card class="income-card">
         <mat-card-title>Total Income</mat-card-title>
         <mat-card-content class="big-number positive">
-          {{ totalIncome() | currency:'INR' }}
+          {{ animIncome | currency:'INR' }}
         </mat-card-content>
       </mat-card>
 
       <mat-card class="expense-card">
         <mat-card-title>Total Expenses</mat-card-title>
         <mat-card-content class="big-number negative">
-          {{ totalExpense() | currency:'INR' }}
+          {{ animExpense | currency:'INR' }}
         </mat-card-content>
       </mat-card>
 
       <mat-card class="balance-card">
         <mat-card-title>Current Balance</mat-card-title>
-        <mat-card-content class="big-number" [ngClass]="{ negative: balance() < 0 }">
-          {{ balance() | currency:'INR' }}
+        <mat-card-content class="big-number" [ngClass]="{ negative: animBalance < 0 }">
+          {{ animBalance | currency:'INR' }}
         </mat-card-content>
       </mat-card>
     </div>
@@ -51,9 +52,65 @@ import { MatCardModule } from '@angular/material/card';
     .balance-card { border-top: 6px solid #3f51b5; }
   `]
 })
-export class SummaryCardsComponent {
+export class SummaryCardsComponent implements OnInit, OnDestroy {
   service = inject(TransactionService);
+  private cdr = inject(ChangeDetectorRef);
+
+  // animated values displayed in template
+  animIncome = 0;
+  animExpense = 0;
+  animBalance = 0;
+
+  // animation control
+  private rafId: number | null = null;
+  private animationDuration = 900; // ms
+
+  ngOnInit(): void {
+    this.startAnimation();
+  }
+
+  ngOnDestroy(): void {
+    if (this.rafId != null) cancelAnimationFrame(this.rafId);
+  }
+
+  // keep original accessors for raw targets if needed
   totalIncome = () => this.service.getTotalIncome();
   totalExpense = () => this.service.getTotalExpense();
   balance = () => this.service.getBalance();
+
+  private startAnimation() {
+    if (this.rafId != null) cancelAnimationFrame(this.rafId);
+
+    const startTimeRef = { start: 0 };
+    const fromIncome = 0;
+    const fromExpense = 0;
+    const fromBalance = 0;
+    const toIncome = this.totalIncome();
+    const toExpense = this.totalExpense();
+    const toBalance = this.balance();
+    const duration = this.animationDuration;
+
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const step = (timestamp: number) => {
+      if (!startTimeRef.start) startTimeRef.start = timestamp;
+      const elapsed = timestamp - startTimeRef.start;
+      const t = Math.min(1, elapsed / duration);
+      const eased = easeOutCubic(t);
+
+      this.animIncome = Math.round((fromIncome + (toIncome - fromIncome) * eased) * 100) / 100;
+      this.animExpense = Math.round((fromExpense + (toExpense - fromExpense) * eased) * 100) / 100;
+      this.animBalance = Math.round((fromBalance + (toBalance - fromBalance) * eased) * 100) / 100;
+
+      this.cdr.detectChanges();
+
+      if (t < 1) {
+        this.rafId = requestAnimationFrame(step);
+      } else {
+        this.rafId = null;
+      }
+    };
+
+    this.rafId = requestAnimationFrame(step);
+  }
 }

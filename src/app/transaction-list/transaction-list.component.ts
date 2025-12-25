@@ -45,12 +45,11 @@ import { TransactionService } from '../transaction.service';
       display: block;
       border-radius: 12px;
       background: linear-gradient(180deg, #ffffff, #fbfbfd);
-      box-shadow: 0 6px 18px rgba(15,23,42,0.06);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
       overflow: hidden;
       transition: transform .12s ease, box-shadow .12s ease;
       border-left: 6px solid transparent;
     }
-    .transaction-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(15,23,42,0.08); }
 
     .transaction-card.income { border-left-color: #34c759; }
     .transaction-card.expense { border-left-color: #ff4d4f; }
@@ -82,7 +81,7 @@ import { TransactionService } from '../transaction.service';
       padding: 6px 12px;
       border: none;
       border-radius: 10px;
-      background: rgba(244,67,54,0.06);
+      background: rgba(244, 67, 54, 0.2);
       color: #b91c1c;
       display: inline-flex;
       align-items: center;
@@ -94,11 +93,11 @@ import { TransactionService } from '../transaction.service';
       margin-left: 0;
       z-index: 10;
     }
-    .delete-btn:hover { background: rgba(244,67,54,0.12); }
+    .delete-btn:hover { background: rgba(244, 67, 54, 0.7); color: #fff; }
     .delete-btn:active { transform: translateY(-50%); }
 
     .empty { text-align: center; color: #6b7280; padding: 40px; font-style: italic; }
-    .fade-in { animation: fadeIn .18s ease both; }
+    .fade-in { animation: fadeIn .5s ease both; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
   `]
 })

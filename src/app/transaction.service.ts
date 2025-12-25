@@ -51,6 +51,33 @@ export class TransactionService {
     this.transactions.update(list => list.filter(t => t.id !== id));
   }
 
+  updateTransaction(idOrTransaction: number | Transaction, updated?: Partial<Transaction>) {
+    let id: number;
+    let upd: Partial<Transaction>;
+
+    if (typeof idOrTransaction === 'number') {
+      id = idOrTransaction;
+      upd = updated ?? {};
+    }
+    else {
+      id = idOrTransaction.id;
+      upd = updated ?? {
+        description: idOrTransaction.description,
+        amount: idOrTransaction.amount,
+        date: idOrTransaction.date,
+        type: idOrTransaction.type
+      };
+    }
+
+    this.transactions.update(list =>
+      list.map(t => t.id === id ? { ...t, ...upd } : t)
+    );
+  }
+
+  getTransactionById(id: number) {
+    return this.transactionsReadonly().find(t => t.id === id);
+  }
+
   getBalance() {
     return this.transactionsReadonly().reduce(
       (sum, t) => (t.type === 'income' ? sum + t.amount : sum - t.amount),

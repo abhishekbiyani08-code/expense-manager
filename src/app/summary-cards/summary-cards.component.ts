@@ -3,6 +3,8 @@ import { TransactionService } from '../transaction.service';
 import { CurrencyPipe, NgClass } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { ChangeDetectorRef } from '@angular/core';
+import { PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-summary-cards',
@@ -55,6 +57,7 @@ import { ChangeDetectorRef } from '@angular/core';
 export class SummaryCardsComponent implements OnInit, OnDestroy {
   service = inject(TransactionService);
   private cdr = inject(ChangeDetectorRef);
+  private platformId = inject(PLATFORM_ID);
 
   // animated values displayed in template
   animIncome = 0;
@@ -66,7 +69,9 @@ export class SummaryCardsComponent implements OnInit, OnDestroy {
   private animationDuration = 900; // ms
 
   ngOnInit(): void {
-    this.startAnimation();
+    if (isPlatformBrowser(this.platformId)) {
+      this.startAnimation();
+    }
   }
 
   ngOnDestroy(): void {

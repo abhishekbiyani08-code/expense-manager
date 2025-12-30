@@ -148,34 +148,41 @@ export class TransactionListComponent {
   private service = inject(TransactionService);
 
   delete(id: number) {
-    if (confirm('Delete this transaction?')) {
+    if (confirm('Delete this transaction?'))
+    {
       this.service.deleteTransaction(id);
     }
   }
 
   update(id: number) {
     const t = this.service.getTransactionById(id);
-    if (!t) {
+    if (!t)
+    {
       alert('Transaction not found.');
       return;
     }
 
     const newDescription = prompt('Update description:', t.description);
-    if (newDescription === null) return;
+    if (newDescription === null)
+      return;
 
     const newAmountStr = prompt('Update amount:', t.amount.toString());
-    if (newAmountStr === null) return;
+    if (newAmountStr === null)
+      return;
     const newAmount = parseFloat(newAmountStr);
-    if (isNaN(newAmount) || newAmount <= 0) {
+    if (isNaN(newAmount) || newAmount <= 0)
+    {
       alert('Invalid amount entered.');
       return;
     }
 
     const existingDateIso = (t.date instanceof Date ? t.date : new Date(t.date)).toISOString().slice(0, 10);
     const newDateStr = prompt('Update date (YYYY-MM-DD):', existingDateIso);
-    if (newDateStr === null) return;
+    if (newDateStr === null)
+      return;
     const newDate = new Date(newDateStr);
-    if (isNaN(newDate.getTime())) {
+    if (isNaN(newDate.getTime()))
+    {
       alert('Invalid date entered.');
       return;
     }

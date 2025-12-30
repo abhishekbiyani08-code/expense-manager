@@ -59,32 +59,32 @@ export class SummaryCardsComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
 
-  // animated values displayed in template
   animIncome = 0;
   animExpense = 0;
   animBalance = 0;
 
-  // animation control
   private rafId: number | null = null;
-  private animationDuration = 900; // ms
+  private animationDuration = 900;
 
   ngOnInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
+    if (isPlatformBrowser(this.platformId))
+    {
       this.startAnimation();
     }
   }
 
   ngOnDestroy(): void {
-    if (this.rafId != null) cancelAnimationFrame(this.rafId);
+    if (this.rafId != null)
+      cancelAnimationFrame(this.rafId);
   }
 
-  // keep original accessors for raw targets if needed
   totalIncome = () => this.service.getTotalIncome();
   totalExpense = () => this.service.getTotalExpense();
   balance = () => this.service.getBalance();
 
   private startAnimation() {
-    if (this.rafId != null) cancelAnimationFrame(this.rafId);
+    if (this.rafId != null)
+      cancelAnimationFrame(this.rafId);
 
     const startTimeRef = { start: 0 };
     const fromIncome = 0;
@@ -98,7 +98,8 @@ export class SummaryCardsComponent implements OnInit, OnDestroy {
     const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
     const step = (timestamp: number) => {
-      if (!startTimeRef.start) startTimeRef.start = timestamp;
+      if (!startTimeRef.start)
+        startTimeRef.start = timestamp;
       const elapsed = timestamp - startTimeRef.start;
       const t = Math.min(1, elapsed / duration);
       const eased = easeOutCubic(t);
@@ -109,9 +110,12 @@ export class SummaryCardsComponent implements OnInit, OnDestroy {
 
       this.cdr.detectChanges();
 
-      if (t < 1) {
+      if (t < 1)
+      {
         this.rafId = requestAnimationFrame(step);
-      } else {
+      }
+      else
+      {
         this.rafId = null;
       }
     };

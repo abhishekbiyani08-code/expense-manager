@@ -15,22 +15,28 @@ export class TransactionService {
   constructor() {
     this.isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-    if (this.isBrowser) {
+    if (this.isBrowser)
+    {
       const saved = localStorage.getItem('expenseManagerTransactions');
-      if (saved) {
-        try {
+      if (saved)
+      {
+        try
+        {
           const parsed = JSON.parse(saved);
           this.transactions.set(
             parsed.map((t: any) => ({ ...t, date: new Date(t.date) }))
           );
-        } catch (e) {
-          if (isDevMode()) {
+        }
+        catch (e)
+        {
+          if (isDevMode())
+          {
             console.warn('Failed to parse saved transactions', e);
           }
         }
       }
-
-      else {
+      else
+      {
         this.transactions.set([]);
       }
 
@@ -55,11 +61,13 @@ export class TransactionService {
     let id: number;
     let upd: Partial<Transaction>;
 
-    if (typeof idOrTransaction === 'number') {
+    if (typeof idOrTransaction === 'number')
+    {
       id = idOrTransaction;
       upd = updated ?? {};
     }
-    else {
+    else
+    {
       id = idOrTransaction.id;
       upd = updated ?? {
         description: idOrTransaction.description,

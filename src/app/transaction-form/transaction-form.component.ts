@@ -21,7 +21,7 @@ import { CommonModule } from '@angular/common';
 
         <div class="form-field">
           <label for="amount">Amount</label>
-          <input id="amount" class="form-input" type="number" formControlName="amount" min="0.01" step="0.01" placeholder="0.00">
+          <input id="amount" class="form-input" type="number" formControlName="amount" min="0.01" max="100000" step="0.01" placeholder="0.00">
         </div>
 
         <div class="form-field">
@@ -64,7 +64,6 @@ import { CommonModule } from '@angular/common';
     }
     .form-input:focus { border-color: #8ab4ff; box-shadow: 0 4px 12px rgba(34,139,230,0.12); }
 
-    /* Date specific tweaks to avoid transparent appearance */
     .date-input::-webkit-calendar-picker-indicator { filter: invert(0.15) sepia(0.02); }
     .date-input { background: #fff; }
 
@@ -122,13 +121,18 @@ export class TransactionFormComponent {
   private getValidationMessages(): string[] {
     const messages: string[] = [];
     const c = this.form.controls;
-    if (c.description.invalid) messages.push('Description is required.');
-    if (c.amount.invalid) {
-      if (c.amount.errors?.['required']) messages.push('Amount is required.');
-      else if (c.amount.errors?.['min']) messages.push('Amount must be at least 0.01.');
+    if (c.description.invalid)
+      messages.push('Description is required.');
+    if (c.amount.invalid)
+    {
+      if (c.amount.errors?.['required'])
+        messages.push('Amount is required.');
+      else if (c.amount.errors?.['min'])
+        messages.push('Amount must be at least 0.01.');
       else messages.push('Amount is invalid.');
     }
-    if (c.date.invalid) messages.push('Date is required.');
+    if (c.date.invalid)
+      messages.push('Date is required.');
     return messages;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, computed, effect } from '@angular/core';
 import { TransactionService } from '../transaction.service';
 import { CurrencyPipe, NgClass } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -66,21 +66,32 @@ export class SummaryCardsComponent implements OnInit, OnDestroy {
   private rafId: number | null = null;
   private animationDuration = 900;
 
+  totalIncome = computed(() => this.service.getTotalIncome());
+  totalExpense = computed(() => this.service.getTotalExpense());
+  balance = computed(() => this.service.getBalance());
+
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
+      effect(() => {
+        this.totalIncome();
+        this.totalExpense();
+        this.balance();
+        this.startAnimation();
+      });
+    }
+  }
+
   ngOnInit(): void {
-    if (isPlatformBrowser(this.platformId))
-    {
+    if (isPlatformBrowser(this.platformId)) {
       this.startAnimation();
     }
   }
 
   ngOnDestroy(): void {
-    if (this.rafId != null)
+    if (this.rafId != null) {
       cancelAnimationFrame(this.rafId);
+    }
   }
-
-  totalIncome = () => this.service.getTotalIncome();
-  totalExpense = () => this.service.getTotalExpense();
-  balance = () => this.service.getBalance();
 
   private startAnimation() {
     if (this.rafId != null)
